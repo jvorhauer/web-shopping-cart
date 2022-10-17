@@ -1,0 +1,1 @@
+rootProject.name = "akka-ktor-shopping-cart"
