@@ -1,3 +1,5 @@
+package nl.miruvor
+
 import akka.actor.testkit.typed.javadsl.TestKitJunitResource
 import akka.actor.typed.javadsl.AskPattern.ask
 import akka.pattern.StatusReply

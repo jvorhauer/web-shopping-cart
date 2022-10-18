@@ -1,3 +1,5 @@
+package nl.miruvor
+
 import akka.actor.typed.ActorRef
 import akka.actor.typed.Behavior
 import akka.actor.typed.SupervisorStrategy
@@ -8,13 +10,16 @@ import akka.persistence.typed.javadsl.Effect
 import akka.persistence.typed.javadsl.EventHandler
 import akka.persistence.typed.javadsl.EventSourcedBehavior
 import akka.persistence.typed.javadsl.RetentionCriteria
+import kotlinx.serialization.Serializable
 import java.time.Duration
 import java.time.Instant
 
 interface CborSerialized
 
+@Serializable
 data class Summary(val items: Map<String, Int>, val checkedOut: Boolean) {
   fun isEmpty() = items.isEmpty()
+  fun toJson() = """{"items":${items.size},"checkedOut":$checkedOut}"""
 }
 
 data class State(val items: MutableMap<String, Int> = mutableMapOf(), var checkoutDate: Instant? = null) {
@@ -111,16 +116,16 @@ class ShoppingCart(private val cartId: String) : EventSourcedBehavior<Command, E
 }
 
 
-typealias Reply = ActorRef<StatusReply<Summary>>
+typealias ReplyTo = ActorRef<StatusReply<Summary>>
 
 sealed interface Command : CborSerialized {
-  val replyTo: Reply
+  val replyTo: ReplyTo
 }
-data class AddItem(val id: String, val quantity: Int, override val replyTo: Reply) : Command
-data class RemoveItem(val id: String, override val replyTo: Reply) : Command
-data class AdjustItemQuantity(val id: String, val quantity: Int, override val replyTo: Reply) : Command
-data class Get(override val replyTo: Reply) : Command
-data class Checkout(override val replyTo: Reply) : Command
+data class AddItem(val id: String, val quantity: Int, override val replyTo: ReplyTo) : Command
+data class RemoveItem(val id: String, override val replyTo: ReplyTo) : Command
+data class AdjustItemQuantity(val id: String, val quantity: Int, override val replyTo: ReplyTo) : Command
+data class Get(override val replyTo: ReplyTo) : Command
+data class Checkout(override val replyTo: ReplyTo) : Command
 
 sealed interface Event : CborSerialized
 data class ItemAdded(val cartId: String, val id: String, val quantity: Int) : Event

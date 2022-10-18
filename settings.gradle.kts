@@ -1,1 +1,1 @@
-rootProject.name = "akka-ktor-shopping-cart"
+rootProject.name = "web-shopping-cart"
